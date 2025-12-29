@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { error } = await supabase
         .from('perfis')
         .update({ unidade_atual_id: unidadeId })
-        .eq('id', user.id);
+        .eq('usuario_id', user.id);
 
       if (error) throw error;
 

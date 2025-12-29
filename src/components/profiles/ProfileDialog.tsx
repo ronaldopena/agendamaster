@@ -106,7 +106,7 @@ export function ProfileDialog({ open, onOpenChange, profileToEdit, onSuccess }: 
       const profileData = {
         ...values,
         organizacao_id: organizacao.id,
-        unidade_padrao_id: values.unidade_padrao_id === 'none' ? null : values.unidade_padrao_id,
+        unidade_padrao_id: (values.unidade_padrao_id === 'none' || !values.unidade_padrao_id) ? null : values.unidade_padrao_id,
       };
 
       if (profileToEdit) {

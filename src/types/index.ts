@@ -21,12 +21,20 @@ export type TipoPerfil = 'admin' | 'gerente' | 'supervisor' | 'atendente' | 'med
 
 export interface Perfil {
   id: string;
+  usuario_id?: string | null; // Link para auth.users
   organizacao_id: string;
   nome: string;
   email: string;
   tipo: TipoPerfil;
   unidade_atual_id?: string | null;
   unidade_padrao_id?: string | null;
+  criado_em: string;
+}
+
+export interface Especialidade {
+  id: string;
+  organizacao_id: string;
+  nome: string;
   criado_em: string;
 }
 
@@ -48,6 +56,27 @@ export interface Paciente {
   data_nascimento?: string;
   telefone?: string;
   email?: string;
+  criado_em: string;
+}
+
+export interface TipoConsulta {
+  id: string;
+  organizacao_id: string;
+  nome: string;
+  criado_em: string;
+}
+
+export interface Convenio {
+  id: string;
+  organizacao_id: string;
+  nome: string;
+  criado_em: string;
+}
+
+export interface Plano {
+  id: string;
+  convenio_id: string;
+  nome: string;
   criado_em: string;
 }
 

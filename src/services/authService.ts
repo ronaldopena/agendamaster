@@ -38,7 +38,7 @@ export const authService = {
       const { error: profileError } = await supabase
         .from('perfis')
         .insert([{
-          id: authData.user.id,
+          usuario_id: authData.user.id,
           organizacao_id: orgData.id,
           nome: nomeUsuario,
           email,

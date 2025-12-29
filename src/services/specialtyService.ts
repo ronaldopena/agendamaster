@@ -1,13 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { Especialidade } from '@/types';
 
-export interface Especialidade {
-  id: string;
-  organizacao_id: string;
-  nome: string;
-  criado_em: string;
-}
-
 export const specialtyService = {
   async getSpecialties(organizacaoId: string) {
     const { data, error } = await supabase
