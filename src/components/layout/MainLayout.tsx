@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sidebar } from './Sidebar';
@@ -12,17 +12,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Loader2 } from 'lucide-react';
+import { unitService } from '@/services/unitService';
+import { Unidade } from '@/types';
 
 export default function MainLayout() {
-  const { session, loading, signOut, user, perfil, unidadeAtual } = useAuth();
+  const { session, loading, signOut, user, perfil, unidadeAtual, mudarUnidade, organizacao } = useAuth();
   const navigate = useNavigate();
+  const [units, setUnits] = useState<Unidade[]>([]);
 
   useEffect(() => {
     if (!loading && !session) {
       navigate('/login');
     }
   }, [session, loading, navigate]);
+
+  useEffect(() => {
+    if (organizacao && (perfil?.tipo === 'admin' || perfil?.tipo === 'gerente')) {
+      unitService.getUnits(organizacao.id).then(setUnits).catch(console.error);
+    }
+  }, [organizacao, perfil]);
 
   if (loading) {
     return (
@@ -34,6 +50,8 @@ export default function MainLayout() {
 
   if (!session) return null;
 
+  const canChangeUnit = perfil?.tipo === 'admin' || perfil?.tipo === 'gerente';
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
@@ -41,15 +59,36 @@ export default function MainLayout() {
       <div className="pl-64 flex flex-col min-h-screen">
         <header className="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-10">
           <div className="flex items-center gap-4">
-            {unidadeAtual ? (
-              <div className="flex items-center gap-2 text-sm text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full">
-                <Building className="w-4 h-4" />
-                <span className="font-medium">{unidadeAtual.nome}</span>
+            {canChangeUnit ? (
+              <div className="flex items-center gap-2">
+                <Building className="w-4 h-4 text-gray-500" />
+                <Select
+                  value={unidadeAtual?.id || ''}
+                  onValueChange={(value) => mudarUnidade(value)}
+                >
+                  <SelectTrigger className="w-[280px] h-9">
+                    <SelectValue placeholder="Selecione uma unidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {units.map((unit) => (
+                      <SelectItem key={unit.id} value={unit.id}>
+                        {unit.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             ) : (
-              <div className="text-sm text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-200">
-                Selecione uma unidade
-              </div>
+              unidadeAtual ? (
+                <div className="flex items-center gap-2 text-sm text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full">
+                  <Building className="w-4 h-4" />
+                  <span className="font-medium">{unidadeAtual.nome}</span>
+                </div>
+              ) : (
+                <div className="text-sm text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-200">
+                  Nenhuma unidade selecionada
+                </div>
+              )
             )}
           </div>
 

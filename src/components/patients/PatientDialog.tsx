@@ -47,7 +47,7 @@ export function PatientDialog({ open, onOpenChange, patientToEdit, onSuccess }: 
   const { organizacao } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       nome: '',
       cpf: '',

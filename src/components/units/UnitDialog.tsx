@@ -48,7 +48,7 @@ export function UnitDialog({ open, onOpenChange, unitToEdit, onSuccess }: UnitDi
   const { organizacao } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       nome: '',
       endereco: '',

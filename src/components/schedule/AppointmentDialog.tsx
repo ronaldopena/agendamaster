@@ -82,7 +82,7 @@ export function AppointmentDialog({ open, onOpenChange, selectedDate, selectedDo
   const { organizacao, unidadeAtual, perfil } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       paciente_id: '',
       medico_id: selectedDoctorId || '',

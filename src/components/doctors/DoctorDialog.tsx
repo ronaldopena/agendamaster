@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Medico } from '@/types';
+import { Medico, Especialidade } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -31,7 +31,7 @@ import {
 import { Loader2, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { doctorService } from '@/services/doctorService';
-import { specialtyService, Especialidade } from '@/services/specialtyService';
+import { specialtyService } from '@/services/specialtyService';
 import { useAuth } from '@/contexts/AuthContext';
 
 const formSchema = z.object({
@@ -57,7 +57,7 @@ export function DoctorDialog({ open, onOpenChange, doctorToEdit, onSuccess }: Do
   const { organizacao } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       nome: '',
       crm: '',

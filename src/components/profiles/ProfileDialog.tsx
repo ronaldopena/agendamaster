@@ -55,7 +55,7 @@ export function ProfileDialog({ open, onOpenChange, profileToEdit, onSuccess }: 
   const { organizacao } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       nome: '',
       email: '',

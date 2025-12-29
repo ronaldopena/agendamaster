@@ -91,4 +91,5 @@ export interface Agendamento {
   status: 'agendado' | 'confirmado' | 'cancelado' | 'realizado' | 'falta';
   observacoes?: string;
   encaixe: boolean;
+  agendado_por_id?: string;
 }
