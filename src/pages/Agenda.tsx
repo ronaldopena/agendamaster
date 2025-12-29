@@ -407,18 +407,46 @@ export default function Agenda() {
               <Button variant="outline" size="icon" onClick={handlePrevDay}>
                   <ChevronLeft className="h-4 w-4" />
               </Button>
-              <div className="flex flex-col items-center min-w-[150px]">
-                  <span className="font-semibold text-lg capitalize">
-                      {format(selectedDate, "EEEE", { locale: ptBR })}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                      {format(selectedDate, "d 'de' MMMM", { locale: ptBR })}
-                  </span>
-              </div>
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal h-auto py-2",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <div className="flex flex-col items-start">
+                        <span className="font-semibold text-sm capitalize leading-none">
+                            {format(selectedDate, "EEEE", { locale: ptBR })}
+                        </span>
+                        <span className="text-xs text-muted-foreground leading-none mt-1">
+                            {format(selectedDate, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                        </span>
+                    </div>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => date && setSelectedDate(date)}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+
               <Button variant="outline" size="icon" onClick={handleNextDay}>
                   <ChevronRight className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" onClick={handleToday} className="text-sm">
+              <Button 
+                variant="default" 
+                onClick={handleToday} 
+                className="text-sm bg-black hover:bg-slate-800 text-white"
+              >
                   Hoje
               </Button>
           </div>
