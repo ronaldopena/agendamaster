@@ -5,14 +5,6 @@ import { Sidebar } from './Sidebar';
 import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon, Building } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -59,6 +51,12 @@ export default function MainLayout() {
       <div className="pl-64 flex flex-col min-h-screen">
         <header className="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-10">
           <div className="flex items-center gap-4">
+            {organizacao && (
+              <div className="flex items-center gap-2 mr-2 border-r pr-4 border-gray-200">
+                <span className="font-semibold text-gray-700">{organizacao.nome}</span>
+              </div>
+            )}
+
             {canChangeUnit ? (
               <div className="flex items-center gap-2">
                 <Building className="w-4 h-4 text-gray-500" />
@@ -93,31 +91,24 @@ export default function MainLayout() {
           </div>
 
           <div className="flex items-center gap-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
-                     <UserIcon className="w-4 h-4" />
-                   </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{perfil?.nome || 'Usuário'}</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                    <p className="text-xs text-primary mt-1 capitalize">{perfil?.tipo}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => signOut()}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex flex-col items-end mr-2">
+              <span className="text-sm font-medium leading-none text-gray-900">{perfil?.nome || 'Usuário'}</span>
+              <span className="text-xs text-muted-foreground">{user?.email}</span>
+            </div>
+            
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
+               <UserIcon className="w-4 h-4" />
+            </div>
+
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => signOut()}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-2 ml-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Sair
+            </Button>
           </div>
         </header>
 
