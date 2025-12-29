@@ -62,6 +62,7 @@ export default function Agenda() {
   const handleToday = () => setSelectedDate(new Date());
 
   const handleNewAppointment = (slotDate?: Date) => {
+    console.log('handleNewAppointment called', { slotDate });
     setEditingAppointment(null);
     setSelectedSlot(slotDate || null);
     setIsDialogOpen(true);

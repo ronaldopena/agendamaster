@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await supabase
             .from('perfis')
             .update({ unidade_atual_id: unidadeIdParaCarregar })
-            .eq('id', userId);
+            .eq('id', perfilData.id);
       }
 
       if (unidadeIdParaCarregar) {

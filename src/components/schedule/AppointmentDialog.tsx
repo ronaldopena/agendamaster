@@ -190,7 +190,7 @@ export function AppointmentDialog({ open, onOpenChange, selectedDate, selectedDo
         medico_id: values.medico_id,
         paciente_id: values.paciente_id,
         tipo_consulta_id: values.tipo_consulta_id,
-        convenio_id: values.convenio_id || null,
+        convenio_id: values.convenio_id === 'none' ? null : (values.convenio_id || null),
         plano_id: values.plano_id || null,
         data_hora_inicio: start.toISOString(),
         data_hora_fim: end.toISOString(),
@@ -396,14 +396,14 @@ export function AppointmentDialog({ open, onOpenChange, selectedDate, selectedDo
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Convênio</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ''}>
+                      <Select onValueChange={field.onChange} value={field.value || 'none'}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Particular" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Particular</SelectItem>
+                          <SelectItem value="none">Particular</SelectItem>
                           {convenios.map((c) => (
                             <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
                           ))}
