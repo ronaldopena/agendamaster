@@ -22,10 +22,29 @@ import {
   DragEndEvent,
   DragStartEvent
 } from '@dnd-kit/core';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+import { useToast } from '@/hooks/use-toast';
 
 // --- Components for DnD ---
 
-function DraggableAppointment({ appointment, onClick, className }: { appointment: any, onClick: (e: React.MouseEvent) => void, className?: string }) {
+function DraggableAppointment({ 
+  appointment, 
+  onClick, 
+  onRemarcar,
+  onEncaixe,
+  className 
+}: { 
+  appointment: any, 
+  onClick: (e: React.MouseEvent) => void, 
+  onRemarcar: (appt: any) => void,
+  onEncaixe: (appt: any) => void,
+  className?: string 
+}) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: String(appointment.id), // Garantir que seja string
     data: appointment,
@@ -38,30 +57,38 @@ function DraggableAppointment({ appointment, onClick, className }: { appointment
   } : undefined;
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
-      {...listeners} 
-      {...attributes}
-      className={cn(className, isDragging && "opacity-50")}
-      onClick={onClick}
-    >
-      <div className="flex justify-between items-start mb-1">
-          <span className="font-bold truncate text-slate-700">
-             {appointment.pacientes?.nome}
-          </span>
-          {appointment.encaixe && (
-              <span className="text-[10px] uppercase font-bold text-orange-600 bg-orange-100 px-1 rounded shrink-0 ml-1">Encaixe</span>
-          )}
-      </div>
-      <div className="flex items-center gap-1 text-slate-500 text-xs">
-          <Clock className="h-3 w-3" />
-          {format(new Date(appointment.data_hora_inicio), 'HH:mm')}
-      </div>
-      <div className="mt-1 text-xs text-slate-500 truncate">
-          {appointment.tipos_consulta?.nome}
-      </div>
-    </div>
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <div 
+          ref={setNodeRef} 
+          style={style} 
+          {...listeners} 
+          {...attributes}
+          className={cn(className, isDragging && "opacity-50")}
+          onClick={onClick}
+        >
+          <div className="flex justify-between items-start mb-1">
+              <span className="font-bold truncate text-slate-700">
+                 {appointment.pacientes?.nome}
+              </span>
+              {appointment.encaixe && (
+                  <span className="text-[10px] uppercase font-bold text-orange-600 bg-orange-100 px-1 rounded shrink-0 ml-1">Encaixe</span>
+              )}
+          </div>
+          <div className="flex items-center gap-1 text-slate-500 text-xs">
+              <Clock className="h-3 w-3" />
+              {format(new Date(appointment.data_hora_inicio), 'HH:mm')}
+          </div>
+          <div className="mt-1 text-xs text-slate-500 truncate">
+              {appointment.tipos_consulta?.nome}
+          </div>
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={() => onRemarcar(appointment)}>Remarcar</ContextMenuItem>
+        <ContextMenuItem onClick={() => onEncaixe(appointment)}>Encaixe</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
 
@@ -98,12 +125,14 @@ function DroppableCell({
 
 export default function Agenda() {
   const { organizacao, unidadeAtual } = useAuth();
+  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>('all');
   const [doctors, setDoctors] = useState<MedicoComEspecialidade[]>([]);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEncaixe, setIsEncaixe] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
   const [clickedDoctorId, setClickedDoctorId] = useState<string | null>(null);
@@ -171,10 +200,11 @@ export default function Agenda() {
   const handleNextDay = () => setSelectedDate(curr => addDays(curr, 1));
   const handleToday = () => setSelectedDate(new Date());
 
-  const handleNewAppointment = (slotDate?: Date, doctorId?: string) => {
+  const handleNewAppointment = (slotDate?: Date, doctorId?: string, encaixe: boolean = false) => {
     setEditingAppointment(null);
     setSelectedSlot(slotDate || null);
     setClickedDoctorId(doctorId || null);
+    setIsEncaixe(encaixe);
     setIsDialogOpen(true);
   };
 
@@ -183,7 +213,21 @@ export default function Agenda() {
     setEditingAppointment(appointment);
     setSelectedSlot(null);
     setClickedDoctorId(appointment.medico_id);
+    setIsEncaixe(false);
     setIsDialogOpen(true);
+  };
+
+  const handleRemarcar = (appointment: any) => {
+    console.log('Remarcar solicitado para:', appointment);
+    toast({
+        title: "Remarcar",
+        description: `Funcionalidade de remarcar selecionada para ${appointment.pacientes?.nome || 'o paciente'}.`,
+    });
+  };
+
+  const handleEncaixe = (appointment: any) => {
+    const slot = new Date(appointment.data_hora_inicio);
+    handleNewAppointment(slot, appointment.medico_id, true);
   };
 
   // Drag and Drop Handlers
@@ -460,14 +504,16 @@ export default function Agenda() {
                                               )}
 
                                               {/* Appointments */}
-                                              <div className="space-y-1">
+                                              <div className="flex gap-1 overflow-x-auto h-full items-start">
                                                   {slotAppointments.map(appt => (
                                                       <DraggableAppointment
                                                           key={appt.id}
                                                           appointment={appt}
                                                           onClick={(e) => handleEditAppointment(appt, e)}
+                                                          onRemarcar={handleRemarcar}
+                                                          onEncaixe={handleEncaixe}
                                                           className={cn(
-                                                              "p-2 rounded text-xs cursor-grab active:cursor-grabbing border shadow-sm hover:shadow-md transition-all touch-none select-none",
+                                                              "p-2 rounded text-xs cursor-grab active:cursor-grabbing border shadow-sm hover:shadow-md transition-all touch-none select-none min-w-[140px] flex-1",
                                                               appt.encaixe ? "bg-orange-100 border-orange-200 text-orange-900" : 
                                                               appt.status === 'confirmado' ? "bg-green-100 border-green-200 text-green-900" :
                                                               "bg-blue-100 border-blue-200 text-blue-900"
@@ -493,6 +539,7 @@ export default function Agenda() {
           selectedDoctorId={clickedDoctorId || (selectedDoctorId !== 'all' ? selectedDoctorId : undefined)}
           appointmentToEdit={editingAppointment}
           onSuccess={fetchAppointments}
+          isEncaixe={isEncaixe}
         />
 
         <DragOverlay>

@@ -68,9 +68,10 @@ interface AppointmentDialogProps {
   selectedDoctorId?: string;
   appointmentToEdit?: any | null; // Usando any por enquanto pois o tipo Agendamento do banco tem joins
   onSuccess: () => void;
+  isEncaixe?: boolean;
 }
 
-export function AppointmentDialog({ open, onOpenChange, selectedDate, selectedDoctorId, appointmentToEdit, onSuccess }: AppointmentDialogProps) {
+export function AppointmentDialog({ open, onOpenChange, selectedDate, selectedDoctorId, appointmentToEdit, onSuccess, isEncaixe }: AppointmentDialogProps) {
   const [loading, setLoading] = useState(false);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [medicos, setMedicos] = useState<MedicoComEspecialidade[]>([]);
@@ -91,7 +92,7 @@ export function AppointmentDialog({ open, onOpenChange, selectedDate, selectedDo
       plano_id: '',
       data_hora_inicio: selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm") : '',
       observacoes: '',
-      encaixe: false,
+      encaixe: isEncaixe || false,
       status: 'agendado',
     },
   });
@@ -140,11 +141,11 @@ export function AppointmentDialog({ open, onOpenChange, selectedDate, selectedDo
         plano_id: '',
         data_hora_inicio: selectedDate ? format(selectedDate, "yyyy-MM-dd'T'HH:mm") : '',
         observacoes: '',
-        encaixe: false,
+        encaixe: isEncaixe || false,
         status: 'agendado',
       });
     }
-  }, [appointmentToEdit, selectedDate, selectedDoctorId, form, open]);
+  }, [appointmentToEdit, selectedDate, selectedDoctorId, form, open, isEncaixe]);
 
   const loadData = async () => {
     if (!organizacao) return;
