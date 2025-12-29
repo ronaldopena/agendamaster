@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus } from 'lucide-react';
-import { format, addDays, subDays, startOfDay, isSameDay, addMinutes, parse, isBefore, isWithinInterval, areIntervalsOverlapping } from 'date-fns';
+import { ChevronLeft, ChevronRight, Clock, Plus } from 'lucide-react';
+import { format, addDays, subDays, startOfDay, addMinutes, parse, isBefore, areIntervalsOverlapping } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { scheduleService } from '@/services/scheduleService';
 import { doctorService, MedicoComEspecialidade } from '@/services/doctorService';
@@ -22,6 +21,7 @@ export default function Agenda() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
+  const [clickedDoctorId, setClickedDoctorId] = useState<string | null>(null);
 
   // Carregar médicos
   useEffect(() => {
@@ -70,9 +70,10 @@ export default function Agenda() {
   const handleNextDay = () => setSelectedDate(curr => addDays(curr, 1));
   const handleToday = () => setSelectedDate(new Date());
 
-  const handleNewAppointment = (slotDate?: Date) => {
+  const handleNewAppointment = (slotDate?: Date, doctorId?: string) => {
     setEditingAppointment(null);
     setSelectedSlot(slotDate || null);
+    setClickedDoctorId(doctorId || null);
     setIsDialogOpen(true);
   };
 
@@ -80,8 +81,15 @@ export default function Agenda() {
     e.stopPropagation();
     setEditingAppointment(appointment);
     setSelectedSlot(null);
+    setClickedDoctorId(appointment.medico_id);
     setIsDialogOpen(true);
   };
+
+  // Filtrar médicos visíveis nas colunas
+  const visibleDoctors = useMemo(() => {
+    if (selectedDoctorId === 'all') return doctors;
+    return doctors.filter(d => d.id === selectedDoctorId);
+  }, [doctors, selectedDoctorId]);
 
   // Gerar Slots de Horário
   const timeSlots = useMemo(() => {
@@ -96,8 +104,6 @@ export default function Agenda() {
     const start = parse(openTime, 'HH:mm', selectedDate);
     let end = parse(closeTime, 'HH:mm', selectedDate);
     
-    // Se o horário de fechamento for menor que abertura, assume que é dia seguinte (ex: 02:00)
-    // Mas para simplificar, vamos assumir horários no mesmo dia por enquanto.
     if (isBefore(end, start)) {
         end = addDays(end, 1);
     }
@@ -111,22 +117,18 @@ export default function Agenda() {
     return slots;
   }, [unidadeAtual, selectedDate]);
 
-  // Função para encontrar agendamentos em um slot
-  const getAppointmentsForSlot = (slotTime: Date) => {
+  // Função para encontrar agendamentos em um slot e médico específico
+  const getAppointmentsForSlotAndDoctor = (slotTime: Date, doctorId: string) => {
     if (!unidadeAtual) return [];
     const duration = unidadeAtual.duracao_consulta || 15;
     const slotEnd = addMinutes(slotTime, duration);
 
     return appointments.filter(appt => {
+      if (appt.medico_id !== doctorId) return false;
+
       const apptStart = new Date(appt.data_hora_inicio);
       const apptEnd = new Date(appt.data_hora_fim);
 
-      // Verifica intersecção de horários
-      // O slot começa em T e termina em T+Duration.
-      // O agendamento deve começar dentro desse intervalo OU cobrir esse intervalo.
-      // Simplificando: Se o agendamento começa exatamente no slot, ou se ele cobre o slot.
-      
-      // Lógica de intersecção:
       return areIntervalsOverlapping(
         { start: slotTime, end: slotEnd },
         { start: apptStart, end: apptEnd }
@@ -135,9 +137,9 @@ export default function Agenda() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-[calc(100vh-120px)] flex flex-col">
       {/* Header da Agenda */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm border">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm border shrink-0">
         <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={handlePrevDay}>
                 <ChevronLeft className="h-4 w-4" />
@@ -177,89 +179,106 @@ export default function Agenda() {
         </div>
       </div>
 
-      {/* Grid de Horários */}
-      <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+      {/* Grid de Horários - Layout de Tabela/Matriz */}
+      <div className="bg-white rounded-lg border shadow-sm flex-1 overflow-hidden flex flex-col">
         {loading ? (
-            <div className="flex justify-center p-20">
+            <div className="flex justify-center items-center h-full">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         ) : (
-            <div className="divide-y">
-                {timeSlots.length === 0 ? (
-                    <div className="p-8 text-center text-muted-foreground">
-                        Nenhum horário disponível configurado para esta unidade.
-                        Verifique os horários de abertura e fechamento.
+            <div className="overflow-auto flex-1">
+                <div className="min-w-max">
+                    {/* Header Row: Time + Doctors */}
+                    <div className="flex border-b sticky top-0 bg-white z-20 shadow-sm">
+                        <div className="w-20 md:w-24 shrink-0 p-4 border-r bg-slate-50 font-medium text-muted-foreground flex items-center justify-center sticky left-0 z-30 shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
+                            <Clock className="w-4 h-4" />
+                        </div>
+                        {visibleDoctors.map(doc => (
+                            <div key={doc.id} className="flex-1 min-w-[200px] p-3 text-center border-r font-semibold text-slate-700 bg-slate-50 flex flex-col items-center justify-center">
+                                <span>{doc.nome}</span>
+                                <span className="text-xs text-muted-foreground font-normal mt-0.5">
+                                    {doc.especialidades?.nome || 'Especialidade não inf.'}
+                                </span>
+                            </div>
+                        ))}
+                        {visibleDoctors.length === 0 && (
+                            <div className="flex-1 p-4 text-center text-muted-foreground">
+                                Nenhum médico encontrado para esta unidade.
+                            </div>
+                        )}
                     </div>
-                ) : (
-                    timeSlots.map((slot, index) => {
-                        const slotAppointments = getAppointmentsForSlot(slot);
-                        const hasAppointments = slotAppointments.length > 0;
-                        const isPast = isBefore(slot, new Date());
 
-                        return (
-                            <div 
-                                key={index} 
-                                className={cn(
-                                    "flex min-h-[80px] group transition-colors",
-                                    hasAppointments ? "bg-white" : "hover:bg-slate-50"
-                                )}
-                            >
-                                {/* Coluna da Hora */}
-                                <div className="w-20 md:w-24 border-r p-4 flex flex-col items-center justify-center bg-slate-50 text-sm font-medium text-muted-foreground">
+                    {/* Body Rows */}
+                    {timeSlots.length === 0 ? (
+                        <div className="p-8 text-center text-muted-foreground">
+                            Nenhum horário disponível configurado para esta unidade.
+                            Verifique os horários de abertura e fechamento.
+                        </div>
+                    ) : (
+                        timeSlots.map((slot, index) => (
+                            <div key={index} className="flex border-b hover:bg-slate-50/30 transition-colors group/row">
+                                {/* Time Column */}
+                                <div className="w-20 md:w-24 shrink-0 border-r p-2 flex items-center justify-center bg-slate-50 text-sm font-medium text-muted-foreground sticky left-0 z-10 shadow-[1px_0_0_0_rgba(0,0,0,0.05)] group-hover/row:bg-slate-100 transition-colors">
                                     {format(slot, 'HH:mm')}
                                 </div>
 
-                                {/* Coluna do Conteúdo */}
-                                <div className="flex-1 p-2 relative">
-                                    {/* Botão de adicionar invisível que aparece no hover (se vazio) */}
-                                    {!hasAppointments && (
-                                        <button 
-                                            className="absolute inset-0 w-full h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() => handleNewAppointment(slot)}
-                                        >
-                                            <div className="flex items-center gap-2 text-primary font-medium bg-primary/10 px-4 py-2 rounded-full">
-                                                <Plus className="h-4 w-4" />
-                                                Agendar
-                                            </div>
-                                        </button>
-                                    )}
+                                {/* Doctor Columns */}
+                                {visibleDoctors.map(doc => {
+                                    const slotAppointments = getAppointmentsForSlotAndDoctor(slot, doc.id);
+                                    const hasAppointments = slotAppointments.length > 0;
 
-                                    {/* Lista de Agendamentos no Slot */}
-                                    <div className="grid gap-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                                        {slotAppointments.map(appt => (
-                                            <div 
-                                                key={appt.id}
-                                                onClick={(e) => handleEditAppointment(appt, e)}
-                                                className={cn(
-                                                    "p-3 rounded-md border text-sm cursor-pointer transition-all hover:shadow-md",
-                                                    appt.encaixe ? "bg-orange-50 border-orange-200" : 
-                                                    appt.status === 'confirmado' ? "bg-green-50 border-green-200" :
-                                                    "bg-blue-50 border-blue-200"
-                                                )}
-                                            >
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <span className="font-bold text-slate-700">
-                                                        {format(new Date(appt.data_hora_inicio), 'HH:mm')} - {appt.pacientes?.nome}
-                                                    </span>
-                                                    {appt.encaixe && (
-                                                        <span className="text-[10px] uppercase font-bold text-orange-600 bg-orange-100 px-1 rounded">Encaixe</span>
-                                                    )}
+                                    return (
+                                        <div 
+                                            key={doc.id} 
+                                            className={cn(
+                                                "flex-1 min-w-[200px] border-r relative p-1 min-h-[60px] transition-colors",
+                                                !hasAppointments && "hover:bg-slate-100 cursor-pointer group/cell"
+                                            )}
+                                            onClick={() => !hasAppointments && handleNewAppointment(slot, doc.id)}
+                                        >
+                                            {/* Add Button (Invisible unless hover/empty) */}
+                                            {!hasAppointments && (
+                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/cell:opacity-100 transition-opacity">
+                                                     <Plus className="h-4 w-4 text-slate-400" />
                                                 </div>
-                                                <div className="flex items-center gap-1 text-slate-500 text-xs">
-                                                    <User className="h-3 w-3" />
-                                                    Dr. {appt.medicos?.nome}
-                                                </div>
-                                                <div className="mt-1 text-xs text-slate-500">
-                                                    {appt.tipos_consulta?.nome}
-                                                </div>
+                                            )}
+
+                                            {/* Appointments */}
+                                            <div className="space-y-1">
+                                                {slotAppointments.map(appt => (
+                                                    <div 
+                                                        key={appt.id}
+                                                        onClick={(e) => handleEditAppointment(appt, e)}
+                                                        className={cn(
+                                                            "p-2 rounded text-xs cursor-pointer border shadow-sm hover:shadow-md transition-all",
+                                                            appt.encaixe ? "bg-orange-100 border-orange-200 text-orange-900" : 
+                                                            appt.status === 'confirmado' ? "bg-green-100 border-green-200 text-green-900" :
+                                                            "bg-blue-100 border-blue-200 text-blue-900"
+                                                        )}
+                                                    >
+                                                        <div className="font-semibold truncate" title={appt.pacientes?.nome}>
+                                                            {appt.pacientes?.nome}
+                                                        </div>
+                                                        <div className="flex justify-between items-center mt-1">
+                                                            <span className="truncate max-w-[100px]" title={appt.tipos_consulta?.nome}>
+                                                                {appt.tipos_consulta?.nome}
+                                                            </span>
+                                                            {appt.encaixe && (
+                                                                <span className="text-[10px] font-bold px-1 bg-white/50 rounded shrink-0 ml-1">
+                                                                    Encaixe
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        );
-                    })
-                )}
+                        ))
+                    )}
+                </div>
             </div>
         )}
       </div>
@@ -267,8 +286,8 @@ export default function Agenda() {
       <AppointmentDialog 
         open={isDialogOpen} 
         onOpenChange={setIsDialogOpen}
-        selectedDate={selectedSlot || selectedDate} // Usa o slot selecionado ou o dia atual
-        selectedDoctorId={selectedDoctorId !== 'all' ? selectedDoctorId : undefined}
+        selectedDate={selectedSlot || selectedDate}
+        selectedDoctorId={clickedDoctorId || (selectedDoctorId !== 'all' ? selectedDoctorId : undefined)}
         appointmentToEdit={editingAppointment}
         onSuccess={fetchAppointments}
       />
