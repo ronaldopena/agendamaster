@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Clock, Plus, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Plus, User, Calendar as CalendarIcon } from 'lucide-react';
 import { format, addDays, subDays, startOfDay, addMinutes, parse, isBefore, areIntervalsOverlapping, differenceInMinutes, parseISO, differenceInYears } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { scheduleService } from '@/services/scheduleService';
 import { doctorService, MedicoComEspecialidade } from '@/services/doctorService';
 import { AppointmentDialog } from '@/components/schedule/AppointmentDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
