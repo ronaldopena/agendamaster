@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Clock, Plus, User } from 'lucide-react';
-import { format, addDays, subDays, startOfDay, addMinutes, parse, isBefore, areIntervalsOverlapping, differenceInMinutes, parseISO } from 'date-fns';
+import { format, addDays, subDays, startOfDay, addMinutes, parse, isBefore, areIntervalsOverlapping, differenceInMinutes, parseISO, differenceInYears } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { scheduleService } from '@/services/scheduleService';
 import { doctorService, MedicoComEspecialidade } from '@/services/doctorService';
@@ -56,19 +56,24 @@ function DraggableAppointment({
     zIndex: 999,
   } : undefined;
 
+  // Calcular idade
+  const idade = appointment.pacientes?.data_nascimento 
+    ? differenceInYears(new Date(), new Date(appointment.pacientes.data_nascimento)) 
+    : null;
+
   return (
     <ContextMenu>
-      <ContextMenuTrigger>
+      <ContextMenuTrigger className="w-full flex-1 h-full">
         <div 
           ref={setNodeRef} 
           style={style} 
           {...listeners} 
           {...attributes}
-          className={cn(className, isDragging && "opacity-50")}
+          className={cn(className, isDragging && "opacity-50", "h-full flex flex-col justify-between w-full")}
           onClick={onClick}
         >
-          <div className="flex justify-between items-start mb-1">
-              <span className="font-bold truncate text-slate-700">
+          <div className="flex justify-between items-start mb-1 w-full">
+              <span className="font-bold truncate text-slate-700 flex-1">
                  {appointment.pacientes?.nome}
               </span>
               {appointment.encaixe && (
@@ -76,10 +81,10 @@ function DraggableAppointment({
               )}
           </div>
           <div className="flex items-center gap-1 text-slate-500 text-xs">
-              <Clock className="h-3 w-3" />
-              {format(new Date(appointment.data_hora_inicio), 'HH:mm')}
+              <User className="h-3 w-3" />
+              {idade !== null ? `${idade} anos` : 'Idade N/I'}
           </div>
-          <div className="mt-1 text-xs text-slate-500 truncate">
+          <div className="mt-1 text-xs text-slate-500 truncate w-full">
               {appointment.tipos_consulta?.nome}
           </div>
         </div>
