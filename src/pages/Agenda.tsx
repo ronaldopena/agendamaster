@@ -58,7 +58,7 @@ function DraggableAppointment({
 
   // Calcular idade
   const idade = appointment.pacientes?.data_nascimento 
-    ? differenceInYears(new Date(), new Date(appointment.pacientes.data_nascimento)) 
+    ? differenceInYears(new Date(), parseISO(appointment.pacientes.data_nascimento)) 
     : null;
 
   return (

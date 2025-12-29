@@ -47,7 +47,7 @@ export const scheduleService = {
       .from('agendamentos')
       .select(`
         *,
-        pacientes(nome, telefone),
+        pacientes(nome, telefone, data_nascimento),
         medicos(nome),
         tipos_consulta(nome),
         convenios(nome),
