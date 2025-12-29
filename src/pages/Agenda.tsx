@@ -38,6 +38,14 @@ export default function Agenda() {
       const start = startOfDay(selectedDate).toISOString();
       const end = startOfDay(addDays(selectedDate, 1)).toISOString();
       
+      console.log('Fetching appointments:', { 
+        org: organizacao.id, 
+        unit: unidadeAtual.id, 
+        start, 
+        end, 
+        doctor: selectedDoctorId 
+      });
+
       const data = await scheduleService.getAppointments(
         organizacao.id,
         unidadeAtual.id,
@@ -45,6 +53,7 @@ export default function Agenda() {
         end,
         selectedDoctorId === 'all' ? undefined : selectedDoctorId
       );
+      console.log('Appointments found:', data);
       setAppointments(data || []);
     } catch (error) {
       console.error('Erro ao buscar agendamentos:', error);
@@ -62,7 +71,6 @@ export default function Agenda() {
   const handleToday = () => setSelectedDate(new Date());
 
   const handleNewAppointment = (slotDate?: Date) => {
-    console.log('handleNewAppointment called', { slotDate });
     setEditingAppointment(null);
     setSelectedSlot(slotDate || null);
     setIsDialogOpen(true);
@@ -80,8 +88,8 @@ export default function Agenda() {
     if (!unidadeAtual) return [];
 
     const slots: Date[] = [];
-    const openTime = unidadeAtual.horario_abertura || '08:00';
-    const closeTime = unidadeAtual.horario_fechamento || '18:00';
+    const openTime = unidadeAtual.horario_abertura?.substring(0, 5) || '08:00';
+    const closeTime = unidadeAtual.horario_fechamento?.substring(0, 5) || '18:00';
     const duration = unidadeAtual.duracao_consulta || 15;
 
     // Criar datas baseadas no dia selecionado

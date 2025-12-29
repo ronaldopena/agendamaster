@@ -42,6 +42,7 @@ export interface Plano {
 export const scheduleService = {
   // Agendamentos
   async getAppointments(organizacaoId: string, unidadeId: string, dateStart: string, dateEnd: string, medicoId?: string) {
+    console.log('Service getAppointments:', { organizacaoId, unidadeId, dateStart, dateEnd, medicoId });
     let query = supabase
       .from('agendamentos')
       .select(`
