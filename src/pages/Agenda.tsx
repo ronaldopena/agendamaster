@@ -27,7 +27,7 @@ import {
 
 function DraggableAppointment({ appointment, onClick, className }: { appointment: any, onClick: (e: React.MouseEvent) => void, className?: string }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: appointment.id,
+    id: String(appointment.id), // Garantir que seja string
     data: appointment,
   });
 
@@ -290,16 +290,58 @@ export default function Agenda() {
     const duration = unidadeAtual.duracao_consulta || 15;
     const slotEnd = addMinutes(slotTime, duration);
 
+    // Debug apenas se houver agendamentos e for o primeiro slot para não poluir
+    // if (appointments.length > 0 && slotTime.getHours() === 8 && slotTime.getMinutes() === 0) {
+    //    console.log('Checking slot:', slotTime, 'Doctor:', doctorId, 'Appointments:', appointments.length);
+    // }
+
     return appointments.filter(appt => {
+      // Verificar se o agendamento pertence a este médico
       if (appt.medico_id !== doctorId) return false;
 
-      const apptStart = new Date(appt.data_hora_inicio);
-      const apptEnd = new Date(appt.data_hora_fim);
+      // Parse seguro das datas
+      let apptStart: Date;
+      let apptEnd: Date;
 
-      return areIntervalsOverlapping(
+      try {
+          apptStart = typeof appt.data_hora_inicio === 'string' 
+              ? parseISO(appt.data_hora_inicio) 
+              : new Date(appt.data_hora_inicio);
+              
+          apptEnd = typeof appt.data_hora_fim === 'string' 
+              ? parseISO(appt.data_hora_fim) 
+              : new Date(appt.data_hora_fim);
+      } catch (e) {
+          console.error('Erro ao fazer parse da data do agendamento:', appt, e);
+          return false;
+      }
+
+      // Verificar sobreposição
+      // Usamos inclusive: false para evitar que um agendamento que termina às 10:00 apareça no slot das 10:00
+      // Mas precisamos garantir que ele apareça no slot correto.
+      // areIntervalsOverlapping padrão é inclusivo nas bordas.
+      
+      const isOverlapping = areIntervalsOverlapping(
         { start: slotTime, end: slotEnd },
-        { start: apptStart, end: apptEnd }
+        { start: apptStart, end: apptEnd },
+        { inclusive: false } // Evita duplicidade em bordas exatas
       );
+
+      // Debug específico para entender por que não está aparecendo
+      if (appointments.length > 0 && !isOverlapping) {
+         // Verificar se deveria aparecer (ex: começa dentro do slot)
+         // Se o agendamento começa >= slotStart e < slotEnd
+         if (apptStart >= slotTime && apptStart < slotEnd) {
+             console.log('DEBUG: Agendamento deveria aparecer neste slot mas areIntervalsOverlapping retornou false', {
+                 slot: { start: slotTime.toISOString(), end: slotEnd.toISOString() },
+                 appt: { start: apptStart.toISOString(), end: apptEnd.toISOString(), id: appt.id },
+                 inclusive: false
+             });
+             return true; // Forçar true se começar dentro do slot
+         }
+      }
+
+      return isOverlapping;
     });
   };
 
