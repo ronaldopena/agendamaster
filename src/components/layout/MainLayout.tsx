@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sidebar } from './Sidebar';
 import { Button } from '@/components/ui/button';
-import { LogOut, User as UserIcon, Building, Menu, ChevronLeft } from 'lucide-react';
+import { LogOut, User as UserIcon, Building, Menu, ChevronLeft, Sun, Moon } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -15,12 +15,14 @@ import { Loader2 } from 'lucide-react';
 import { unitService } from '@/services/unitService';
 import { Unidade } from '@/types';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function MainLayout() {
   const { session, loading, signOut, user, perfil, unidadeAtual, mudarUnidade, organizacao } = useAuth();
   const navigate = useNavigate();
   const [units, setUnits] = useState<Unidade[]>([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (!loading && !session) {
