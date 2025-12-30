@@ -447,7 +447,7 @@ export default function Agenda() {
               <Button 
                 variant="default" 
                 onClick={handleToday} 
-                className="text-sm bg-black hover:bg-slate-800 text-white"
+                className="text-sm"
               >
                   Hoje
               </Button>

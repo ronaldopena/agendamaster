@@ -45,7 +45,7 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 isActive 
-                  ? "bg-primary/10 text-primary" 
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
                 isCollapsed && "justify-center px-2"
               )}
