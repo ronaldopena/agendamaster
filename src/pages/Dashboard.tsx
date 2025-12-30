@@ -166,7 +166,7 @@ export default function Dashboard() {
             <CardTitle>Próximas Consultas</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-center h-[200px] text-muted-foreground border-2 border-dashed rounded-md bg-gray-50">
+            <div className="flex items-center justify-center h-[200px] text-muted-foreground border-2 border-dashed rounded-md bg-muted/20">
               Gráfico ou Lista detalhada virá aqui
             </div>
           </CardContent>
@@ -177,7 +177,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
              <div className="space-y-4">
-                <div className="flex items-start gap-4 p-3 bg-blue-50 text-blue-700 rounded-md">
+                <div className="flex items-start gap-4 p-3 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-200 rounded-md">
                    <AlertCircle className="h-5 w-5 mt-0.5" />
                    <div>
                       <p className="font-medium text-sm">Bem-vindo ao Agenda Master!</p>

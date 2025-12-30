@@ -49,11 +49,11 @@ export default function MainLayout() {
   const canChangeUnit = perfil?.tipo === 'admin' || perfil?.tipo === 'gerente';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isCollapsed={isSidebarCollapsed} />
       
       <div className={cn("flex flex-col min-h-screen transition-all duration-300", isSidebarCollapsed ? "pl-16" : "pl-64")}>
-        <header className="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-10">
+        <header className="h-16 bg-background border-b flex items-center justify-between px-6 sticky top-0 z-10">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -65,14 +65,14 @@ export default function MainLayout() {
             </Button>
 
             {organizacao && (
-              <div className="flex items-center gap-2 mr-2 border-r pr-4 border-gray-200">
-                <span className="font-semibold text-gray-700">{organizacao.nome}</span>
+              <div className="flex items-center gap-2 mr-2 border-r pr-4 border-border">
+                <span className="font-semibold text-foreground">{organizacao.nome}</span>
               </div>
             )}
 
             {canChangeUnit ? (
               <div className="flex items-center gap-2">
-                <Building className="w-4 h-4 text-gray-500" />
+                <Building className="w-4 h-4 text-muted-foreground" />
                 <Select
                   value={unidadeAtual?.id || ''}
                   onValueChange={(value) => mudarUnidade(value)}
@@ -91,12 +91,12 @@ export default function MainLayout() {
               </div>
             ) : (
               unidadeAtual ? (
-                <div className="flex items-center gap-2 text-sm text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full">
+                <div className="flex items-center gap-2 text-sm text-foreground bg-muted px-3 py-1.5 rounded-full">
                   <Building className="w-4 h-4" />
                   <span className="font-medium">{unidadeAtual.nome}</span>
                 </div>
               ) : (
-                <div className="text-sm text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-200">
+                <div className="text-sm text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-200 px-3 py-1.5 rounded-full border border-yellow-200 dark:border-yellow-800">
                   Nenhuma unidade selecionada
                 </div>
               )
@@ -114,7 +114,7 @@ export default function MainLayout() {
             </Button>
 
             <div className="flex flex-col items-end mr-2">
-              <span className="text-sm font-medium leading-none text-gray-900">{perfil?.nome || 'Usuário'}</span>
+              <span className="text-sm font-medium leading-none text-foreground">{perfil?.nome || 'Usuário'}</span>
               <span className="text-xs text-muted-foreground">{user?.email}</span>
             </div>
             
@@ -126,7 +126,7 @@ export default function MainLayout() {
               variant="ghost" 
               size="sm" 
               onClick={() => signOut()}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-2 ml-2"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 ml-2"
             >
               <LogOut className="h-4 w-4" />
               Sair

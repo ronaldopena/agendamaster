@@ -57,7 +57,7 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
         })}
       </nav>
 
-      <div className={cn("p-4 border-t text-xs text-gray-500 text-center", isCollapsed && "hidden")}>
+      <div className={cn("p-4 border-t text-xs text-muted-foreground text-center", isCollapsed && "hidden")}>
         v0.1.0
       </div>
     </aside>
