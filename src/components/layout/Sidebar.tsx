@@ -22,7 +22,7 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
   return (
     <aside 
       className={cn(
-        "bg-white border-r h-screen flex flex-col fixed left-0 top-0 z-10 transition-all duration-300",
+        "bg-background border-r h-screen flex flex-col fixed left-0 top-0 z-10 transition-all duration-300",
         isCollapsed ? "w-16" : "w-64"
       )}
     >
