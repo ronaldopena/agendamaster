@@ -110,17 +110,36 @@ export function ProfileDialog({ open, onOpenChange, profileToEdit, onSuccess }: 
       };
 
       if (profileToEdit) {
-        await profileService.updateProfile(profileToEdit.id, profileData);
-        toast({ title: 'Perfil atualizado com sucesso!' });
+        // Se estiver editando E tiver senha preenchida, tentamos criar o usuário no Auth (vincular)
+        if ((values as any).password) {
+            await profileService.createProfileWithAuth({
+                ...profileData,
+                password: (values as any).password
+            });
+             toast({ title: 'Perfil atualizado e acesso de usuário habilitado!' });
+        } else {
+            await profileService.updateProfile(profileToEdit.id, profileData);
+            toast({ title: 'Perfil atualizado com sucesso!' });
+        }
       } else {
-        // Nota: A criação direta aqui não cria o usuário no Auth.
-        // O ideal seria integrar com uma função de convite.
-        // Vamos apenas criar o registro e avisar.
-        await profileService.createProfile(profileData as any);
-        toast({ 
-          title: 'Perfil criado com sucesso!', 
-          description: 'Lembre-se que o usuário precisa ser criado no Auth para logar.' 
-        });
+        if ((values as any).password) {
+            // Cria usuário no Auth via Edge Function
+            await profileService.createProfileWithAuth({
+                ...profileData,
+                password: (values as any).password
+            });
+            toast({ 
+                title: 'Usuário e Perfil criados com sucesso!', 
+                description: 'O usuário já pode fazer login no sistema.' 
+            });
+        } else {
+            // Cria apenas o perfil (sem login)
+            await profileService.createProfile(profileData as any);
+            toast({ 
+              title: 'Perfil criado com sucesso!', 
+              description: 'Para acessar o sistema, será necessário vincular um usuário posteriormente.' 
+            });
+        }
       }
 
       onSuccess();
