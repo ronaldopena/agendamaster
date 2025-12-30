@@ -70,7 +70,7 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-primary">Criar Nova Conta</CardTitle>
@@ -81,7 +81,7 @@ export default function SignUp() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               
               <div className="space-y-4 border-b pb-4">
-                <h3 className="font-semibold text-gray-700">Dados da Clínica</h3>
+                <h3 className="font-semibold text-foreground">Dados da Clínica</h3>
                 <FormField
                   control={form.control}
                   name="nomeOrganizacao"
@@ -111,7 +111,7 @@ export default function SignUp() {
               </div>
 
               <div className="space-y-4 pt-2">
-                <h3 className="font-semibold text-gray-700">Dados do Administrador</h3>
+                <h3 className="font-semibold text-foreground">Dados do Administrador</h3>
                 <FormField
                   control={form.control}
                   name="nomeUsuario"
@@ -182,7 +182,7 @@ export default function SignUp() {
           </Form>
         </CardContent>
         <CardFooter className="justify-center border-t pt-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Já tem uma conta?{' '}
             <Link to="/login" className="text-primary font-medium hover:underline">
               Fazer Login

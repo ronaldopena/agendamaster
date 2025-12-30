@@ -41,7 +41,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-primary">Agenda Master</CardTitle>
@@ -82,7 +82,7 @@ export default function Login() {
                 'Entrar'
               )}
             </Button>
-            <div className="text-center text-sm text-gray-600">
+            <div className="text-center text-sm text-muted-foreground">
               Não tem uma conta?{' '}
               <a href="/signup" className="text-primary font-medium hover:underline">
                 Cadastre sua clínica
