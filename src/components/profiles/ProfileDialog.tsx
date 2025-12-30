@@ -173,6 +173,23 @@ export function ProfileDialog({ open, onOpenChange, profileToEdit, onSuccess }: 
                 </FormItem>
               )}
             />
+            
+            {!profileToEdit && (
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Senha</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="******" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            )}
+
             <FormField
               control={form.control}
               name="tipo"

@@ -44,6 +44,15 @@ export const profileService = {
     return data as Perfil;
   },
 
+  async createProfileWithAuth(profile: any) {
+    const { data, error } = await supabase.functions.invoke('create-user', {
+      body: profile
+    });
+
+    if (error) throw error;
+    return data;
+  },
+
   async updateProfile(id: string, profile: Partial<Omit<Perfil, 'id' | 'criado_em'>>) {
     // Remove undefined values to avoid Supabase errors if any
     const cleanProfile = Object.fromEntries(
