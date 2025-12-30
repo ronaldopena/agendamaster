@@ -46,11 +46,20 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar isCollapsed={isSidebarCollapsed} />
       
-      <div className="pl-64 flex flex-col min-h-screen">
+      <div className={cn("flex flex-col min-h-screen transition-all duration-300", isSidebarCollapsed ? "pl-16" : "pl-64")}>
         <header className="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-10">
           <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="mr-2"
+            >
+              {isSidebarCollapsed ? <Menu className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+            </Button>
+
             {organizacao && (
               <div className="flex items-center gap-2 mr-2 border-r pr-4 border-gray-200">
                 <span className="font-semibold text-gray-700">{organizacao.nome}</span>

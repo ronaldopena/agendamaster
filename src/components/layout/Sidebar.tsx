@@ -12,13 +12,26 @@ const menuItems = [
   { icon: Settings, label: 'Configurações', path: '/configuracoes' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  isCollapsed: boolean;
+}
+
+export function Sidebar({ isCollapsed }: SidebarProps) {
   const location = useLocation();
 
   return (
-    <aside className="w-64 bg-white border-r h-screen flex flex-col fixed left-0 top-0 z-10">
-      <div className="h-16 flex items-center px-6 border-b">
-        <h1 className="text-xl font-bold text-primary">Agenda Master</h1>
+    <aside 
+      className={cn(
+        "bg-white border-r h-screen flex flex-col fixed left-0 top-0 z-10 transition-all duration-300",
+        isCollapsed ? "w-16" : "w-64"
+      )}
+    >
+      <div className={cn("h-16 flex items-center border-b", isCollapsed ? "justify-center" : "px-6")}>
+        {isCollapsed ? (
+             <span className="text-xl font-bold text-primary">AM</span>
+        ) : (
+            <h1 className="text-xl font-bold text-primary whitespace-nowrap overflow-hidden">Agenda Master</h1>
+        )}
       </div>
 
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
@@ -28,21 +41,23 @@ export function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
+              title={isCollapsed ? item.label : undefined}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 isActive 
                   ? "bg-primary/10 text-primary" 
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                isCollapsed && "justify-center px-2"
               )}
             >
-              <item.icon className="w-5 h-5" />
-              {item.label}
+              <item.icon className="w-5 h-5 shrink-0" />
+              {!isCollapsed && <span>{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t text-xs text-gray-500 text-center">
+      <div className={cn("p-4 border-t text-xs text-gray-500 text-center", isCollapsed && "hidden")}>
         v0.1.0
       </div>
     </aside>
