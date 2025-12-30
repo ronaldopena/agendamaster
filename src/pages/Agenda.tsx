@@ -75,18 +75,18 @@ function DraggableAppointment({
           onClick={onClick}
         >
           <div className="flex justify-between items-start mb-1 w-full">
-              <span className="font-bold truncate text-slate-700 flex-1">
+              <span className="font-bold truncate text-foreground flex-1">
                  {appointment.pacientes?.nome}
               </span>
               {appointment.encaixe && (
-                  <span className="text-[10px] uppercase font-bold text-orange-600 bg-orange-100 px-1 rounded shrink-0 ml-1">Encaixe</span>
+                  <span className="text-[10px] uppercase font-bold text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/40 px-1 rounded shrink-0 ml-1">Encaixe</span>
               )}
           </div>
-          <div className="flex items-center gap-1 text-slate-500 text-xs">
+          <div className="flex items-center gap-1 text-muted-foreground text-xs">
               <User className="h-3 w-3" />
               {idade !== null ? `${idade} anos` : 'Idade N/I'}
           </div>
-          <div className="mt-1 text-xs text-slate-500 truncate w-full">
+          <div className="mt-1 text-xs text-muted-foreground truncate w-full">
               {appointment.tipos_consulta?.nome}
           </div>
         </div>
@@ -120,7 +120,7 @@ function DroppableCell({
   return (
     <div 
       ref={setNodeRef} 
-      className={cn(className, isOver && "bg-blue-50 ring-2 ring-inset ring-blue-300")}
+      className={cn(className, isOver && "bg-primary/10 ring-2 ring-inset ring-primary/30")}
       onClick={onClick}
     >
       {children}
@@ -404,7 +404,7 @@ export default function Agenda() {
     >
       <div className="space-y-6 h-[calc(100vh-120px)] flex flex-col">
         {/* Header da Agenda */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm border shrink-0">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-card p-4 rounded-lg shadow-sm border shrink-0">
           <div className="flex items-center gap-4">
               <Button variant="outline" size="icon" onClick={handlePrevDay}>
                   <ChevronLeft className="h-4 w-4" />
@@ -473,7 +473,7 @@ export default function Agenda() {
         </div>
 
         {/* Grid de Horários - Layout de Tabela/Matriz */}
-        <div className="bg-white rounded-lg border shadow-sm flex-1 overflow-hidden flex flex-col">
+        <div className="bg-card rounded-lg border shadow-sm flex-1 overflow-hidden flex flex-col">
           {loading ? (
               <div className="flex justify-center items-center h-full">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -482,12 +482,12 @@ export default function Agenda() {
               <div className="overflow-auto flex-1">
                   <div className="min-w-max">
                       {/* Header Row: Time + Doctors */}
-                      <div className="flex border-b sticky top-0 bg-white z-20 shadow-sm">
-                          <div className="w-20 md:w-24 shrink-0 p-4 border-r bg-slate-50 font-medium text-muted-foreground flex items-center justify-center sticky left-0 z-30 shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
+                      <div className="flex border-b sticky top-0 bg-card z-20 shadow-sm">
+                          <div className="w-20 md:w-24 shrink-0 p-4 border-r bg-muted/40 font-medium text-muted-foreground flex items-center justify-center sticky left-0 z-30 shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
                               <Clock className="w-4 h-4" />
                           </div>
                           {visibleDoctors.map(doc => (
-                              <div key={doc.id} className="flex-1 min-w-[200px] p-3 text-center border-r font-semibold text-slate-700 bg-slate-50 flex flex-col items-center justify-center">
+                              <div key={doc.id} className="flex-1 min-w-[200px] p-3 text-center border-r font-semibold text-foreground bg-muted/40 flex flex-col items-center justify-center">
                                   <span>{doc.nome}</span>
                                   <span className="text-xs text-muted-foreground font-normal mt-0.5">
                                       {doc.especialidades?.nome || 'Especialidade não inf.'}
@@ -509,9 +509,9 @@ export default function Agenda() {
                           </div>
                       ) : (
                           timeSlots.map((slot, index) => (
-                              <div key={index} className="flex border-b hover:bg-slate-50/30 transition-colors group/row">
+                              <div key={index} className="flex border-b hover:bg-muted/30 transition-colors group/row">
                                   {/* Time Column */}
-                                  <div className="w-20 md:w-24 shrink-0 border-r p-2 flex items-center justify-center bg-slate-50 text-sm font-medium text-muted-foreground sticky left-0 z-10 shadow-[1px_0_0_0_rgba(0,0,0,0.05)] group-hover/row:bg-slate-100 transition-colors">
+                                  <div className="w-20 md:w-24 shrink-0 border-r p-2 flex items-center justify-center bg-muted/40 text-sm font-medium text-muted-foreground sticky left-0 z-10 shadow-[1px_0_0_0_rgba(0,0,0,0.05)] group-hover/row:bg-muted/60 transition-colors">
                                       {format(slot, 'HH:mm')}
                                   </div>
 
@@ -527,14 +527,14 @@ export default function Agenda() {
                                               doctorId={doc.id}
                                               className={cn(
                                                   "flex-1 min-w-[200px] border-r relative p-1 min-h-[60px] transition-colors",
-                                                  !hasAppointments && "hover:bg-slate-100 cursor-pointer group/cell"
+                                                  !hasAppointments && "hover:bg-accent cursor-pointer group/cell"
                                               )}
                                               onClick={() => !hasAppointments && handleNewAppointment(slot, doc.id)}
                                           >
                                               {/* Add Button (Invisible unless hover/empty) */}
                                               {!hasAppointments && (
                                                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/cell:opacity-100 transition-opacity pointer-events-none">
-                                                       <Plus className="h-4 w-4 text-slate-400" />
+                                                       <Plus className="h-4 w-4 text-muted-foreground" />
                                                   </div>
                                               )}
 
@@ -549,9 +549,9 @@ export default function Agenda() {
                                                           onEncaixe={handleEncaixe}
                                                           className={cn(
                                                               "p-2 rounded text-xs cursor-grab active:cursor-grabbing border shadow-sm hover:shadow-md transition-all touch-none select-none min-w-[140px] flex-1",
-                                                              appt.encaixe ? "bg-orange-100 border-orange-200 text-orange-900" : 
-                                                              appt.status === 'confirmado' ? "bg-green-100 border-green-200 text-green-900" :
-                                                              "bg-blue-100 border-blue-200 text-blue-900"
+                                                              appt.encaixe ? "bg-orange-100 dark:bg-orange-900/40 border-orange-200 dark:border-orange-800 text-orange-900 dark:text-orange-100" : 
+                                                              appt.status === 'confirmado' ? "bg-green-100 dark:bg-green-900/40 border-green-200 dark:border-green-800 text-green-900 dark:text-green-100" :
+                                                              "bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-100"
                                                           )}
                                                       />
                                                   ))}
@@ -581,16 +581,16 @@ export default function Agenda() {
            {activeAppointment ? (
                <div className={cn(
                   "p-2 rounded text-xs border shadow-lg w-[200px]",
-                  activeAppointment.encaixe ? "bg-orange-100 border-orange-200 text-orange-900" : 
-                  activeAppointment.status === 'confirmado' ? "bg-green-100 border-green-200 text-green-900" :
-                  "bg-blue-100 border-blue-200 text-blue-900"
+                  activeAppointment.encaixe ? "bg-orange-100 dark:bg-orange-900/40 border-orange-200 dark:border-orange-800 text-orange-900 dark:text-orange-100" : 
+                  activeAppointment.status === 'confirmado' ? "bg-green-100 dark:bg-green-900/40 border-green-200 dark:border-green-800 text-green-900 dark:text-green-100" :
+                  "bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-100"
               )}>
                   <div className="flex justify-between items-start mb-1">
-                      <span className="font-bold truncate text-slate-700">
+                      <span className="font-bold truncate text-foreground">
                          {activeAppointment.pacientes?.nome}
                       </span>
                   </div>
-                  <div className="flex items-center gap-1 text-slate-500 text-xs">
+                  <div className="flex items-center gap-1 text-muted-foreground text-xs">
                       <Clock className="h-3 w-3" />
                       {format(new Date(activeAppointment.data_hora_inicio), 'HH:mm')}
                   </div>
