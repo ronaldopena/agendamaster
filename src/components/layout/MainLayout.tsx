@@ -102,6 +102,15 @@ export default function MainLayout() {
           </div>
 
           <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="mr-2"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+
             <div className="flex flex-col items-end mr-2">
               <span className="text-sm font-medium leading-none text-gray-900">{perfil?.nome || 'Usuário'}</span>
               <span className="text-xs text-muted-foreground">{user?.email}</span>
