@@ -39,6 +39,7 @@ const formSchema = z.object({
   email: z.string().email('Email inválido'),
   tipo: z.enum(['admin', 'gerente', 'supervisor', 'atendente', 'medico']),
   unidade_padrao_id: z.string().optional(),
+  password: z.string().optional(),
 });
 
 interface ProfileDialogProps {

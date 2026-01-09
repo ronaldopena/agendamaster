@@ -80,7 +80,7 @@ export default function SignUp() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               
-              <div className="space-y-4 border-b pb-4">
+              <div className="space-y-4 border-b border-border pb-4">
                 <h3 className="font-semibold text-foreground">Dados da Clínica</h3>
                 <FormField
                   control={form.control}
@@ -181,7 +181,7 @@ export default function SignUp() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="justify-center border-t pt-4">
+        <CardFooter className="justify-center border-t border-border pt-4">
           <p className="text-sm text-muted-foreground">
             Já tem uma conta?{' '}
             <Link to="/login" className="text-primary font-medium hover:underline">
